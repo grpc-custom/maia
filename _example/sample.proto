@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package sample;
+
+import "maia.proto";
+import "google/protobuf/empty.proto";
+
+option (maia.version) = "1.0.0";
+
+service SampleService {
+    option (maia.view) = {
+        title: "sample title"
+        group: "sample"
+    };
+    rpc List(ListSampleRequest) returns (SampleResponse) {
+        option (maia.component) = {
+            type: VIEW
+        };
+    }
+    rpc Create(CreateSampleRequest) returns (google.protobuf.Empty) {
+        option (maia.component) = {
+            type: CREATE
+        };
+    }
+    rpc Update(UpdateSampleRequest) returns (google.protobuf.Empty) {
+        option (maia.component) = {
+            type: UPDATE
+        };
+    }
+    rpc Delete(DeleteSampleRequest) returns (google.protobuf.Empty) {
+        option (maia.component) = {
+            type: DELETE
+        };
+    }
+    rpc Import(ImportSampleRequest) returns (google.protobuf.Empty) {
+        option (maia.component) = {
+            type: IMPORT
+            import_option {
+                diff: true
+            }
+        };
+    }
+    rpc Example(ExportSampleRequest) returns (google.protobuf.Empty) {
+        option (maia.component) = {
+            type: EXPORT
+        };
+    }
+    rpc Search(SearchSampleRequest) returns (SearchSampleResponse) {}
+}
+
+message ListSampleRequest {
+    string keyword = 1 [(maia.required) = true];
+}
+
+message CreateSampleRequest {
+    Sample sample = 1;
+}
+
+message UpdateSampleRequest {
+    Sample sample = 1;
+}
+
+message DeleteSampleRequest {
+    string id = 1 [(maia.required) = true];
+}
+
+message ImportSampleRequest {
+    maia.File file = 1;
+}
+
+message SearchSampleRequest {}
+
+message SearchSampleResponse {}
+
+message ExportSampleRequest {
+    repeated string id = 1 [(maia.required) = true];
+}
+
+message SampleResponse {
+    repeated Sample samples = 1 [(maia.table) = {
+        columns {label: "ID"     field: "id"}
+        columns {label: "NAME"   field: "name"}
+        columns {label: "JOB"    field: "job"}
+        columns {label: "GENDER" field: "gender"}
+        pagination: true
+        size: 20
+    }];
+}
+
+message Sample {
+    option (maia.form_option) = {
+        title: "A registration form sample"
+        description: "A simple form example."
+    };
+    string first_name = 1 [(maia.form) = {label: "First name"}, (maia.required) = true];
+    string last_name  = 2 [(maia.form) = {label: "Last name"}, (maia.required) = true];
+    int64 age         = 3 [(maia.form) = {label: "Age" nullable: true}];
+    int64 num         = 4 [(maia.form) = {label: "Num"}];
+    double bio        = 5 [(maia.form) = {label: "Bio" nullable: true}];
+    string password   = 6 [(maia.form) = {label: "Password" type: PASSWORD}];
+    string comment    = 7 [(maia.form) = {type: TEXTAREA nullable: true}];
+}
+
+enum Gender {
+    option (maia.select) ={
+        default_label: "-- select an option --"
+    };
+    male   = 0 [(maia.label) = "MALE"];
+    female = 1 [(maia.label) = "FEMALE"];
+    other  = 2 [(maia.label) = "OTHER"];
+}
